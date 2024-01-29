@@ -1,18 +1,27 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, effect, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterOutlet } from '@angular/router';
+import { RedditService } from './shared/data-access/reddit.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet],
-  template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <router-outlet></router-outlet>
-  `,
+  template: ` <router-outlet></router-outlet> `,
   styles: [],
 })
 export class AppComponent {
-  title = 'Gifs-Angular';
+  redditService = inject(RedditService);
+  snackBar = inject(MatSnackBar);
+
+  constructor() {
+    effect(() => {
+      const error = this.redditService.error();
+
+      if (error !== null) {
+        this.snackBar.open(error, 'Dismiss', { duration: 2000 });
+      }
+    });
+  }
 }
